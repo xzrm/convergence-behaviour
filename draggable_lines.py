@@ -13,21 +13,27 @@ class draggable_line:
 
         if kind == "h":
             y = [XorY, XorY]
-            self.line = self.ax.axhline(y=y[0], color='r', lw=2, linestyle='-', picker=5)
+            self.line = self.ax.axhline(
+                y=y[0], color="r", lw=2, linestyle="-", picker=5
+            )
 
         elif kind == "v":
             x = [XorY, XorY]
-            self.line = self.ax.axvline(x=x[0], color='r', lw=2, linestyle='-', picker=5)
+            self.line = self.ax.axvline(
+                x=x[0], color="r", lw=2, linestyle="-", picker=5
+            )
 
         self.c.draw_idle()
-        self.sid = self.c.mpl_connect('pick_event', self.clickonline)
+        self.sid = self.c.mpl_connect("pick_event", self.clickonline)
         print(self.sid)
 
     def clickonline(self, event):
         if event.artist == self.line:
             print("line selected ", event.artist)
             self.follower = self.c.mpl_connect("motion_notify_event", self.followmouse)
-            self.releaser = self.c.mpl_connect("button_press_event", self.releaseonclick)
+            self.releaser = self.c.mpl_connect(
+                "button_press_event", self.releaseonclick
+            )
 
     def followmouse(self, event):
         if self.o == "h":

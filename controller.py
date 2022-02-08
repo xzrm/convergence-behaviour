@@ -10,7 +10,7 @@ import data
 import phases
 
 
-class Controller():
+class Controller:
     def __init__(self):
         self.root = tk.Tk()
 
@@ -18,33 +18,43 @@ class Controller():
         self.view.sidepanel.plot_button.bind("<Button>", self.plot_convergence)
         self.view.sidepanel.clear_button.bind("<Button>", self.clear_plot)
 
-        self.view.menubar.menu.entryconfig(self.view.menubar.menu.index("Read file"), command=self.read_outfile_path)
-        self.view.menubar.menu.entryconfig(self.view.menubar.menu.index("New"), command=self.add_new_tab)
-        self.view.menubar.menu.entryconfig(self.view.menubar.menu.index("Close"), command=self.delete_selected_tab)
+        self.view.menubar.menu.entryconfig(
+            self.view.menubar.menu.index("Read file"), command=self.read_outfile_path
+        )
+        self.view.menubar.menu.entryconfig(
+            self.view.menubar.menu.index("New"), command=self.add_new_tab
+        )
+        self.view.menubar.menu.entryconfig(
+            self.view.menubar.menu.index("Close"), command=self.delete_selected_tab
+        )
 
-        self.view.listbox_steps.add_button.bind("<Button>",
-                                                lambda event,
-                                                view_member=self.view.listbox_steps,
-                                                tab_attr="added_annot":
-                                                self.draw_object(view_member, tab_attr))
+        self.view.listbox_steps.add_button.bind(
+            "<Button>",
+            lambda event, view_member=self.view.listbox_steps, tab_attr="added_annot": self.draw_object(
+                view_member, tab_attr
+            ),
+        )
 
-        self.view.listbox_steps.delete_selected_button.bind("<Button>",
-                                                            lambda event,
-                                                            view_member=self.view.listbox_steps,
-                                                            tab_attr="added_annot":
-                                                            self.delete_object(view_member, tab_attr))
+        self.view.listbox_steps.delete_selected_button.bind(
+            "<Button>",
+            lambda event, view_member=self.view.listbox_steps, tab_attr="added_annot": self.delete_object(
+                view_member, tab_attr
+            ),
+        )
 
-        self.view.listbox_lines.add_button.bind("<Button>",
-                                                lambda event,
-                                                view_member=self.view.listbox_lines,
-                                                tab_attr="custom_lines_objs":
-                                                self.draw_object(view_member, tab_attr))
+        self.view.listbox_lines.add_button.bind(
+            "<Button>",
+            lambda event, view_member=self.view.listbox_lines, tab_attr="custom_lines_objs": self.draw_object(
+                view_member, tab_attr
+            ),
+        )
 
-        self.view.listbox_lines.delete_selected_button.bind("<Button>",
-                                                            lambda event,
-                                                            view_member=self.view.listbox_lines,
-                                                            tab_attr="custom_lines_objs":
-                                                            self.delete_object(view_member, tab_attr))
+        self.view.listbox_lines.delete_selected_button.bind(
+            "<Button>",
+            lambda event, view_member=self.view.listbox_lines, tab_attr="custom_lines_objs": self.delete_object(
+                view_member, tab_attr
+            ),
+        )
 
         # self.tabs = {}  # dict in form of {'.!frame4.!notebook.!frame': <tab_data.Tab object at 0x0D7C27D0>, ...}
         self.add_new_tab()
@@ -54,7 +64,7 @@ class Controller():
         self.file_name = os.path.basename(self.outfile_path)
 
         curr_tab = self.view.plotview.get_current_tab_obj()
-        if(self.file_name):
+        if self.file_name:
             self.view.plotview.notebook.tab(curr_tab, text=self.file_name)
 
         self.curr_view_data.file_path = self.outfile_path
@@ -66,7 +76,7 @@ class Controller():
         self.canvas.draw()
 
     def add_new_tab(self):
-        self.outfile_path = ''
+        self.outfile_path = ""
         tab = self.view.plotview.add_tab()
         tab.bind("<Visibility>", self.on_visibility)
         tab_object = self.view.plotview.notebook.tabs()[-1]
@@ -93,10 +103,12 @@ class Controller():
     def update_plotview(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            self.curr_frame = self.view.plotview.get_current_tab_obj().split('.')[3]
+            self.curr_frame = self.view.plotview.get_current_tab_obj().split(".")[3]
             self.curr_tab = self.view.plotview.get_current_tab_obj()
             print("Current frame", self.curr_frame, "Current tab", self.curr_tab)
-            self.curr_view_data = tab_data.current_view_data.get_instance_by_frame(self.curr_tab)
+            self.curr_view_data = tab_data.current_view_data.get_instance_by_frame(
+                self.curr_tab
+            )
 
             self.ax = self.view.plotview.tabs_content[self.curr_frame]
             self.fig = self.ax.get_figure()
@@ -109,7 +121,7 @@ class Controller():
         curr_tab = self.view.plotview.get_current_tab_obj()
         self.view.plotview.delete_selected_tab()
         tab_data.current_view_data.delete_view(self.curr_tab)
-        if(len(tab_data.current_view_data.instances)) == 0:
+        if (len(tab_data.current_view_data.instances)) == 0:
             self.add_new_tab()
         # del self.tabs[curr_tab]
 
@@ -132,7 +144,9 @@ class Controller():
         self.tolerance = float(self.view.sidepanel.tolerance_entry.get())
         try:
 
-            self.text_list = phases.text_single_phase(self.outfile_path, self.phase_number)
+            self.text_list = phases.text_single_phase(
+                self.outfile_path, self.phase_number
+            )
             if self.text_list == None:
                 self.text_list = phases.text_analaysis_no_phases(self.outfile_path)
 
@@ -140,12 +154,22 @@ class Controller():
             print("Read .out file")
             return False
 
-        self.step_objects, self.convergence = data.get_data(self.text_list, self.norm, self.tolerance)
+        self.step_objects, self.convergence = data.get_data(
+            self.text_list, self.norm, self.tolerance
+        )
 
-        self.steps_unconv, self.variations_unconv = self.unpack(self.convergence.itera_unconv_pairs)
-        self.steps_conv_other, self.variations_conv_other = self.unpack(self.convergence.converged_norm_other)
-        self.steps_conv_this, self.variations_conv_this = self.unpack(self.convergence.converged_norm_this)
-        self.steps_all, self.variation_all = self.unpack(self.convergence.full_step_itera)
+        self.steps_unconv, self.variations_unconv = self.unpack(
+            self.convergence.itera_unconv_pairs
+        )
+        self.steps_conv_other, self.variations_conv_other = self.unpack(
+            self.convergence.converged_norm_other
+        )
+        self.steps_conv_this, self.variations_conv_this = self.unpack(
+            self.convergence.converged_norm_this
+        )
+        self.steps_all, self.variation_all = self.unpack(
+            self.convergence.full_step_itera
+        )
 
         self.step_objects_array = np.array(self.step_objects)
 
@@ -165,38 +189,74 @@ class Controller():
 
         self.ax.clear()
 
-        self.ax.plot((list(range(1, len(self.convergence.all_iterations) + 1))), self.convergence.all_iterations, color='blue', lw=0.5, label=self.view.sidepanel.norm_droplist.get().title() + " norm")
+        self.ax.plot(
+            (list(range(1, len(self.convergence.all_iterations) + 1))),
+            self.convergence.all_iterations,
+            color="blue",
+            lw=0.5,
+            label=self.view.sidepanel.norm_droplist.get().title() + " norm",
+        )
 
-        self.ax.axhline(y=self.tolerance, lw=1.5, color='red', linestyle=':', label='Convergence tolerance')
+        self.ax.axhline(
+            y=self.tolerance,
+            lw=1.5,
+            color="red",
+            linestyle=":",
+            label="Convergence tolerance",
+        )
 
         for step in self.convergence.full_step_itera:
-            self.ax.axvline(x=step[0], color='g', lw=0.5, linestyle='-')
-        self.full_steps, = self.ax.plot(self.steps_all, self.variation_all, 'gD', markersize=4)
+            self.ax.axvline(x=step[0], color="g", lw=0.5, linestyle="-")
+        (self.full_steps,) = self.ax.plot(
+            self.steps_all, self.variation_all, "gD", markersize=4
+        )
 
         self.curr_view_data.full_steps = self.full_steps
-        self.ax.plot(self.steps_unconv, self.variations_unconv, 'rD', markersize=4, label='Unconverged steps')
-        self.ax.plot(self.steps_conv_this, self.variations_conv_this, 'gD', markersize=4, label='Converged steps')
-        self.ax.plot(self.steps_conv_other, self.variations_conv_other, 'yD', markersize=4, label='Converged steps - other norm')
+        self.ax.plot(
+            self.steps_unconv,
+            self.variations_unconv,
+            "rD",
+            markersize=4,
+            label="Unconverged steps",
+        )
+        self.ax.plot(
+            self.steps_conv_this,
+            self.variations_conv_this,
+            "gD",
+            markersize=4,
+            label="Converged steps",
+        )
+        self.ax.plot(
+            self.steps_conv_other,
+            self.variations_conv_other,
+            "yD",
+            markersize=4,
+            label="Converged steps - other norm",
+        )
 
         self.plot_setting()
         self.canvas.draw()
-        self.canvas.mpl_connect("motion_notify_event", lambda event, arg=self.curr_view_data: self.updatable_annot.hover(event, arg))
-
+        self.canvas.mpl_connect(
+            "motion_notify_event",
+            lambda event, arg=self.curr_view_data: self.updatable_annot.hover(
+                event, arg
+            ),
+        )
 
         self.draw_object(self.view.listbox_steps, "added_annot")
         self.draw_object(self.view.listbox_lines, "custom_lines_objs")
 
     def plot_setting(self):
-        self.ax.set_yscale('log')
-        self.ax.set_ylabel('log(variation)')
-        self.ax.set_xlabel('total iterations')
-        self.ax.grid(True, which="both", color='0.65', ls="--")
-        self.ax.legend(loc="upper left", prop={'size': 8}, framealpha=0.7)
+        self.ax.set_yscale("log")
+        self.ax.set_ylabel("log(variation)")
+        self.ax.set_xlabel("total iterations")
+        self.ax.grid(True, which="both", color="0.65", ls="--")
+        self.ax.legend(loc="upper left", prop={"size": 8}, framealpha=0.7)
 
         self.updatable_annot = updatable_annotation(self.ax, self.full_steps)
 
     def unpack(self, iterable):
-        if(iterable):
+        if iterable:
             unpacked_elements_1, unpacked_elements_2 = list(zip(*iterable))
             return unpacked_elements_1, unpacked_elements_2
         return [], []
@@ -305,11 +365,13 @@ class Controller():
         for i in self.curr_view_data.custom_lines_objs.keys():
             self.view.listbox_lines.listbox.insert(tk.END, i)
 
-        self.view.sidepanel.set_droplist_values(self.curr_view_data.phases, self.curr_view_data.current_phase)
+        self.view.sidepanel.set_droplist_values(
+            self.curr_view_data.phases, self.curr_view_data.current_phase
+        )
 
     def update_listbox_entry(self, line_obj):
         for k, v in self.curr_view_data.custom_lines_objs.items():
-            if(v == line_obj):
+            if v == line_obj:
                 listbox_index = self.view.listbox_lines.listbox.get(0, "end").index(k)
                 x = int(v.line.get_xdata()[0])
                 old_key = k
@@ -317,5 +379,7 @@ class Controller():
                 break
 
         self.view.listbox_lines.update_item(listbox_index, x)
-        self.curr_view_data.custom_lines_objs[new_key] = self.curr_view_data.custom_lines_objs[old_key]
+        self.curr_view_data.custom_lines_objs[
+            new_key
+        ] = self.curr_view_data.custom_lines_objs[old_key]
         del self.curr_view_data.custom_lines_objs[old_key]

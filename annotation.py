@@ -1,5 +1,3 @@
-
-
 class step_annotation:
     def __init__(self, ax, step, x, y):
         self.ax = ax
@@ -11,12 +9,20 @@ class step_annotation:
 
         print(self.x, self.y)
 
-        self.annot = self.ax.annotate("", xy=(self.x, self.y), xytext=(-20, 20), textcoords="offset points",
-                                      bbox=dict(boxstyle="round", fc="w"), arrowprops=dict(arrowstyle="->"))
+        self.annot = self.ax.annotate(
+            "",
+            xy=(self.x, self.y),
+            xytext=(-20, 20),
+            textcoords="offset points",
+            bbox=dict(boxstyle="round", fc="w"),
+            arrowprops=dict(arrowstyle="->"),
+        )
 
-        text = "Step no: {}\nLoadcase: {}".format(str(self.step.get_step_no()),
-                                                  str(self.step.get_loadcase()),
-                                                  str(self.step.total_iterations))
+        text = "Step no: {}\nLoadcase: {}".format(
+            str(self.step.get_step_no()),
+            str(self.step.get_loadcase()),
+            str(self.step.total_iterations),
+        )
 
         self.annot.set_text(text)
         self.annot.get_bbox_patch().set_alpha(0.7)
@@ -32,10 +38,14 @@ class updatable_annotation:
         self.canvas = self.ax.get_figure().canvas
         self.data_xy = data_xy
 
-        self.annot = self.ax.annotate("", xy=(0, 0), xytext=(-20, 20),
-                                      textcoords="offset points",
-                                      bbox=dict(boxstyle="round", fc="w"),
-                                      arrowprops=dict(arrowstyle="->"))
+        self.annot = self.ax.annotate(
+            "",
+            xy=(0, 0),
+            xytext=(-20, 20),
+            textcoords="offset points",
+            bbox=dict(boxstyle="round", fc="w"),
+            arrowprops=dict(arrowstyle="->"),
+        )
 
         self.annot.set_visible(False)
 
@@ -47,10 +57,12 @@ class updatable_annotation:
         step_idx = ind["ind"][0]
         self.annot.xy = (x[step_idx], y[step_idx])
 
-        text = "Step no: {}\nLoadcase: {}\nTotal iterations: {} \nVariation: {}".format(str(curr_data.                                                            step_objects[step_idx].get_step_no()),
-                                                                                        str(curr_data.step_objects[step_idx].get_loadcase()),
-                                                                                        str(x[step_idx]),
-                                                                                        str(y[step_idx]))
+        text = "Step no: {}\nLoadcase: {}\nTotal iterations: {} \nVariation: {}".format(
+            str(curr_data.step_objects[step_idx].get_step_no()),
+            str(curr_data.step_objects[step_idx].get_loadcase()),
+            str(x[step_idx]),
+            str(y[step_idx]),
+        )
 
         self.annot.set_text(text)
         self.annot.get_bbox_patch().set_alpha(0.7)
@@ -59,7 +71,9 @@ class updatable_annotation:
 
         visiblity = self.annot.get_visible()
         if event.inaxes == self.ax:
-            contains, idx = self.data_xy.contains(event)  # check if cursor hovers over one of full_steps array and returns index
+            contains, idx = self.data_xy.contains(
+                event
+            )  # check if cursor hovers over one of full_steps array and returns index
             # Result form example: True/False {'ind': array([53], dtype=int32)}
             if contains:
                 self.update_annot(idx, curr_data)
